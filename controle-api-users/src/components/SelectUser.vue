@@ -1,25 +1,21 @@
 <template>
-  <b-row value="mt-5">
-    <b-col>
-      <b-form-group>
-        <b-form-select v-model="selected">
+  <b-col>
+    <b-form-group>
+      <b-form-select v-model="selected">
+        <b-form-select-option value="null" selected>
+          Selectione o Usuario
+        </b-form-select-option>
 
-          <b-form-select-option value="null" selected>
-            Selectione o Usuario
-          </b-form-select-option>
-
-          <b-form-select-option
-            v-for="(usuario, index) in users"
-            :key="index"
-            :value="usuario"
-          >
-            {{ usuario.firstName }}
-          </b-form-select-option>
-
-        </b-form-select>
-      </b-form-group>
-    </b-col>
-  </b-row>
+        <b-form-select-option
+          v-for="(usuario, index) in users"
+          :key="index"
+          :value="usuario"
+        >
+          {{ usuario.firstName }}
+        </b-form-select-option>
+      </b-form-select>
+    </b-form-group>
+  </b-col>
 </template>
 
 <script>
@@ -33,8 +29,8 @@ export default {
     };
   },
 
-  props : {
-    getUsuarioSelecionado : Function
+  props: {
+    getUsuarioSelecionado: Function,
   },
 
   methods: {
@@ -59,9 +55,9 @@ export default {
     this.getUser();
   },
 
-  updated: function() {
-    this.getUsuarioSelecionado( this.selected )
-  }
+  updated: function () {
+    this.getUsuarioSelecionado(this.selected);
+  },
 };
 </script>
 
