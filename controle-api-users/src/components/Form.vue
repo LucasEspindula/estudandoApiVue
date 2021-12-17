@@ -2,23 +2,23 @@
   <b-col md="6">
     <h3 class="mb-3">Cadastro novo usuário</h3>
     <b-form-group label="Primeiro nome">
-      <b-form-input type="text" v-model="firstName" />
+      <b-form-input :state="firstName.validation" type="text" v-model="firstName.valor" />
     </b-form-group>
     <b-form-group label="Sobrenome">
-      <b-form-input type="text" v-model="lastName" />
+      <b-form-input :state="lastName.validation" type="text" v-model="lastName.valor" />
     </b-form-group>
     <b-form-group label="Idade">
-      <b-form-input type="text" v-model="age" />
+      <b-form-input :state="age.validation" type="text" v-model="age.valor" />
     </b-form-group>
     <b-form-group label="Username">
-      <b-form-input type="text" v-model="username" />
+      <b-form-input :state="username.validation" type="text" v-model="username.valor" />
     </b-form-group>
     <b-form-group label="Senha">
-      <b-form-input type="text" v-model="password" />
+      <b-form-input :state="password.validation" type="text" v-model="password.valor" />
     </b-form-group>
     <b-form-group>
       <b-button @click="createUser" variant="primary">Salvar</b-button>
-      <p>{{ message }}</p>
+      <p>{{ massage }}</p>
     </b-form-group>
   </b-col>
 </template>
@@ -28,11 +28,26 @@ export default {
   name: "Form",
   data: function () {
     return {
-      firstName: "",
-      lastName: "",
-      age: "",
-      username: "",
-      password: "",
+      firstName: {
+        valor: "",
+        validation: null,
+      },
+      lastName: {
+        valor: "",
+        validation: null,
+      },
+      age: {
+        valor: "",
+        validation: null,
+      },
+      username: {
+        valor: "",
+        validation: null,
+      },
+      password: {
+        valor: "",
+        validation: null,
+      },
       massage: "",
     };
   },
@@ -47,6 +62,18 @@ export default {
         password: this.password,
       };
 
+      let isError = null;
+
+      this.firstName.validation = this.isValidate(this.firstName.valor)
+      this.lastName.validation = this.isValidate(this.lastName.valor)      
+      this.age.validation = this.isValidate(this.age.valor)
+      this.username.validation = this.isValidate(this.username.valor)
+      this.password.validation = this.isValidate(this.password.valor)
+      
+      if(!isError) {
+        return;
+      }
+      
       const result = await fetch("http://localhost:3000", {
         headers: {
           Accept: "application/json",
@@ -61,7 +88,7 @@ export default {
         .catch((error) => {
           return {
             error: true,
-            message: error,
+            massage: error,
           };
         });
 
@@ -71,9 +98,19 @@ export default {
         this.age = "";
         this.username = "";
         this.password = "";
-        this.message = "Usuário cadastrado com sucesso";
+        this.massage = "Usuário cadastrado com sucesso";
       }
     },
+
+    isValidate: function(valor, error) {
+      if(valor && valor !== ""){
+        error = true
+        return error;
+      }
+
+      error = false;
+      return error;
+    }
   },
 };
 </script>
