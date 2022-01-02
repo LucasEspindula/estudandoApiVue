@@ -2,22 +2,38 @@
   <b-col md="6">
     <h3 class="mb-3">Cadastro novo usuário</h3>
     <b-form-group label="Primeiro nome">
-      <b-form-input :state="firstName.validation" type="text" v-model="firstName.valor" />
+      <b-form-input
+        :state="firstName.validation"
+        type="text"
+        v-model="firstName.valor"
+      />
     </b-form-group>
     <b-form-group label="Sobrenome">
-      <b-form-input :state="lastName.validation" type="text" v-model="lastName.valor" />
+      <b-form-input
+        :state="lastName.validation"
+        type="text"
+        v-model="lastName.valor"
+      />
     </b-form-group>
     <b-form-group label="Idade">
       <b-form-input :state="age.validation" type="text" v-model="age.valor" />
     </b-form-group>
     <b-form-group label="Username">
-      <b-form-input :state="username.validation" type="text" v-model="username.valor" />
+      <b-form-input
+        :state="username.validation"
+        type="text"
+        v-model="username.valor"
+      />
     </b-form-group>
     <b-form-group label="Senha">
-      <b-form-input :state="password.validation" type="text" v-model="password.valor" />
+      <b-form-input
+        :state="password.validation"
+        type="text"
+        v-model="password.valor"
+      />
     </b-form-group>
     <b-form-group>
-      <b-button @click="createUser" variant="primary">Salvar</b-button>
+      <b-button @click="isSubmit" variant="primary">Salvar</b-button>
       <p>{{ massage }}</p>
     </b-form-group>
   </b-col>
@@ -26,6 +42,9 @@
 <script>
 export default {
   name: "Form",
+  props: {
+    usuarioSelecionado: Object,
+  },
   data: function () {
     return {
       firstName: {
@@ -55,25 +74,29 @@ export default {
   methods: {
     createUser: async function () {
       const newUser = {
-        firstName: this.firstName,
-        lastName: this.lastName,
-        age: this.age,
-        username: this.username,
-        password: this.password,
+        firstName: this.firstName.valor,
+        lastName: this.lastName.valor,
+        age: this.age.valor,
+        username: this.username.valor,
+        password: this.password.valor,
       };
 
-      let isError = null;
+      let isError = [];
 
-      this.firstName.validation = this.isValidate(this.firstName.valor)
-      this.lastName.validation = this.isValidate(this.lastName.valor)      
-      this.age.validation = this.isValidate(this.age.valor)
-      this.username.validation = this.isValidate(this.username.valor)
-      this.password.validation = this.isValidate(this.password.valor)
-      
-      if(!isError) {
+      this.firstName.validation = this.isValidate(
+        this.firstName.valor,
+        isError
+      );
+      this.lastName.validation = this.isValidate(this.lastName.valor, isError);
+      this.age.validation = this.isValidate(this.age.valor, isError);
+      this.username.validation = this.isValidate(this.username.valor, isError);
+      this.password.validation = this.isValidate(this.password.valor, isError);
+
+      if (isError.includes(false)) {
+        this.massage = "Campos obrigatorios não preenchidos";
         return;
       }
-      
+
       const result = await fetch("http://localhost:3000", {
         headers: {
           Accept: "application/json",
@@ -93,23 +116,128 @@ export default {
         });
 
       if (!result.error) {
-        this.firstName = "";
-        this.lastName = "";
-        this.age = "";
-        this.username = "";
-        this.password = "";
+        this.firstName = {
+          valor: "",
+          validation: null,
+        };
+        this.lastName = {
+          valor: "",
+          validation: null,
+        };
+        this.age = {
+          valor: "",
+          validation: null,
+        };
+        this.username = {
+          valor: "",
+          validation: null,
+        };
+        this.password = {
+          valor: "",
+          validation: null,
+        };
         this.massage = "Usuário cadastrado com sucesso";
       }
     },
 
-    isValidate: function(valor, error) {
-      if(valor && valor !== ""){
-        error = true
-        return error;
+    updateUser: async function () {
+      const newUser = {
+        firstName: this.firstName.valor,
+        lastName: this.lastName.valor,
+        age: this.age.valor,
+        username: this.username.valor,
+        password: this.password.valor,
+      };
+
+      let isError = [];
+
+      this.firstName.validation = this.isValidate(
+        this.firstName.valor,
+        isError
+      );
+      this.lastName.validation = this.isValidate(this.lastName.valor, isError);
+      this.age.validation = this.isValidate(this.age.valor, isError);
+      this.username.validation = this.isValidate(this.username.valor, isError);
+      this.password.validation = this.isValidate(this.password.valor, isError);
+
+      if (isError.includes(false)) {
+        this.massage = "Campos obrigatorios não preenchidos";
+        return;
       }
 
-      error = false;
-      return error;
+      const result = await fetch(
+        "http://localhost:3000/" + this.usuarioSelecionado._id,
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+
+          method: "PUT",
+          body: JSON.stringify(newUser),
+        }
+      )
+        .then((res) => res.json())
+        .then((res) => res)
+        .catch((error) => {
+          return {
+            error: true,
+            massage: error,
+          };
+        });
+
+      if (!result.error) {
+        this.firstName = {
+          valor: "",
+          validation: null,
+        };
+        this.lastName = {
+          valor: "",
+          validation: null,
+        };
+        this.age = {
+          valor: "",
+          validation: null,
+        };
+        this.username = {
+          valor: "",
+          validation: null,
+        };
+        this.password = {
+          valor: "",
+          validation: null,
+        };
+        this.massage = "Usuário atualizado com sucesso";
+      }
+    },
+
+    isValidate: function (valor, error) {
+      if (valor && valor !== "") {
+        error.push(true);
+        return true;
+      }
+
+      error.push(false);
+      return false;
+    },
+
+    isSubmit: function () {
+      if (this.usuarioSelecionado && this.usuarioSelecionado.username) {
+        this.updateUser();
+        return;
+      }
+
+      this.createUser();
+    },
+  },
+
+  mounted() {
+    if (this.usuarioSelecionado && this.usuarioSelecionado.username) {
+      this.firstName.valor = this.usuarioSelecionado.firstName;
+      this.lastName.valor = this.usuarioSelecionado.lastName;
+      this.age.valor = this.usuarioSelecionado.age;
+      this.username.valor = this.usuarioSelecionado.username;
+      this.password.valor = this.usuarioSelecionado.password;
     }
   },
 };

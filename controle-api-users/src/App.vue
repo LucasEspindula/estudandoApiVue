@@ -3,9 +3,10 @@
     <Header />
     <b-container class="mt-5">
       <b-row>
-        <SelectUser 
-        :getUsuarioSelecionado="getUsuarioSelecionado" 
-        v-show="!flag"/>
+        <SelectUser
+          :getUsuarioSelecionado="getUsuarioSelecionado"
+          v-show="!flag"
+        />
         <b-col md="3" :offset="flag ? 9 : 0">
           <b-button @click="onChangeFlag" variant="success"
             >Novo usuario</b-button
@@ -20,10 +21,11 @@
         :idade="Number(usuarioSelecionado.age)"
         :username="usuarioSelecionado.username"
         :password="usuarioSelecionado.password"
+        :onChangeFlag="onChangeFlag"
       />
 
-      <b-row v-show="flag">
-        <Form />
+      <b-row v-if="flag">
+        <Form :usuarioSelecionado="usuarioSelecionado" />
       </b-row>
     </b-container>
   </div>
